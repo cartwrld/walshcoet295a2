@@ -75,21 +75,21 @@ Y = df['loan_status'].astype('float32')
 X = df.drop("loan_status", axis=1).astype('float32')
 
 model = keras.Sequential()
-model.add(layers.Dense(6, activation="relu"))  # input layer
-model.add(layers.Dense(6, activation="relu"))  # input layer
-model.add(layers.Dense(6, activation="relu"))  # input layer
+model.add(layers.Dense(7, activation="relu"))  # input layer
+# model.add(layers.Dense(5, activation="relu"))  # input layer
+model.add(layers.Dense(3, activation="relu"))  # input layer
 model.add(layers.Dense(1, activation="sigmoid"))  # hidden layer 1
 # model.add(layers.Dense(4, activation="relu"))  # hidden layer 2
 # model.add(layers.Dense(1))  # output layer
 
 model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['accuracy'])
 
-results = model.fit(X, Y, validation_split=0.2, batch_size=128, epochs=32)
+results = model.fit(X, Y, validation_split=0.21, batch_size=100, epochs=200)
 
 acc_chart(results)
 loss_chart(results)
 
-
+model.save("models/loan.keras")
 
 
 
