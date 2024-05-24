@@ -29,7 +29,7 @@ df['loan_status'] = df['loan_status'].map({'Denied': 0, 'Approved': 1})
 print(df.head(20).to_string())
 
 # (3)[a] Create a Heatmap for the given DataFrame.
-plt.figure(figsize=(18,12))
+plt.figure(figsize=(18, 12))
 sb.heatmap(df.corr(), annot=True)
 plt.show()
 
@@ -78,45 +78,35 @@ X = df.drop("loan_status", axis=1).astype('float32')
 
 model = keras.Sequential()
 model.add(layers.Dense(6, activation="relu"))  # input layer
-# model.add(layers.Dense(5, activation="relu"))  # input layer
 model.add(layers.Dense(3, activation="relu"))  # input layer
 model.add(layers.Dense(1, activation="sigmoid"))  # hidden layer 1
-# model.add(layers.Dense(4, activation="relu"))  # hidden layer 2
-# model.add(layers.Dense(1))  # output layer
+
 
 model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['accuracy'])
 
-results = model.fit(X, Y, validation_split=0.21, batch_size=1024, epochs=210, verbose=1)
+results = model.fit(X, Y, validation_split=0.21, batch_size=10, epochs=50)
 
 acc_chart(results)
 loss_chart(results)
 
 test_loan_preds = [
-    np.array([50,1,2,2,140000,700]),    # Single Older People Who Make a Lot of Money but Have Bad Credit
-    np.array([18,1,0,1,72000,400]),     # Young Married Professionals with Moderate Income and Good Credit
-    np.array([33,0,0,0,12000,255]),     # Single Young Adults with Low Income and Average Credit
+    # older male / married / masters / high income / good credit
+    np.array([50, 1, 2, 2, 140000, 700]),  # should be approved
+    # young male / married / highschool / mid-high income / mid credit
+    np.array([18, 1, 0, 1, 72000, 400]),  # should be approved
+    # adult female / single / highschool / low income / poor credit
+    np.array([33, 0, 0, 0, 12000, 255]),  # should be denied
 
 ]
 
-
 for applicant in test_loan_preds:
-    # print(applicant)
     predictions = model.predict(np.array([applicant]))
     prediction = (predictions > 0.5).astype(int)
 
-    print(prediction[0])
-
+    if prediction[0] == 0:
+        print("[Denied]")
+    else:
+        print("[Approved]")
 
 
 # model.save("models/loan.keras")
-
-
-
-
-
-
-
-
-
-
-

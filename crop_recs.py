@@ -5,7 +5,7 @@ import numpy as np
 import seaborn as sb
 import matplotlib.pyplot as plt
 from charts import acc_chart, loss_chart
-from tensorflow.keras.regularizers import l2
+
 
 df = pd.read_csv("data/Crop_Recommendation.csv")
 
@@ -18,27 +18,31 @@ print(crop_dict)
 
 df['Crop'] = df['Crop'].map(crop_dict)
 
-# plt.figure(figsize=(10, 8))
-# sb.heatmap(df.corr(), annot=True)
-# plt.show()
+plt.figure(figsize=(20, 12))
+sb.heatmap(df.corr(), annot=True)
+plt.show()
 
 
 def compile_model(optimizer, loss, title):
-    Y = df['Crop'].astype('float32')
     X = df.drop("Crop", axis=1).astype('float32')
+    Y = df['Crop'].astype('float32')
 
     model = keras.Sequential([
 
-        layers.Dense(7, activation="relu", kernel_regularizer=l2(0.01)),
+        layers.Dense(512, activation="leaky_relu"),
+        layers.Dropout(0.6),
+        layers.Dense(256, activation="leaky_relu"),
         layers.Dropout(0.2),
-        # layers.Dense(11, activation="leaky_relu", kernel_regularizer=l2(0.01)),
+
+
 
         layers.Dense(len(crops_arr), activation="softmax"),
+
     ])
 
     model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
-    results = model.fit(X, Y, validation_split=0.10, batch_size=110, epochs=10)
+    results = model.fit(X, Y, validation_split=0.211, batch_size=11, epochs=50)
 
     acc_chart(results, title)
     # loss_chart(results, title)
@@ -67,20 +71,25 @@ def get_top_crops(preds, crop_dict):
 
         for key, value in crop_dict.items():
             if value == first_index:
-                print(f"Value: {value} at index: {first_index}")
+                # print(f"first_index: {first_index}")
+                # print(f"first_highest: {first_highest}")
+                # print(f"kv: {key}:{value}")
                 return [first_index, first_highest, key]
 
         return None
 
     details = get_highest_details()
-    first_crop = crop_dict[details[2]]
-    print(f"First Highest Crop: {first_crop}, Probability: {details[1]:.4f}")
+
+    first_crop = details[2]
+    # print(first_crop)
+    print("=============================================================")
+    print(f"1st Place Crop: {first_crop}, Probability: {details[1]:.4f}")
 
     preds[details[0]] = -1
 
     details = get_highest_details()
-    second_crop = crop_dict[details[2]]
-    print(f"Second Highest Crop: {second_crop}, Probability: {details[0]:.4f}")
+    second_crop = details[2]
+    print(f"2nd Place Crop: {second_crop}, Probability: {details[1]:.4f}")
 
 
 compile_model("adam", "sparse_categorical_crossentropy", "Adam/SCCE")
