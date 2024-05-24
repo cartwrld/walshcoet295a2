@@ -12,8 +12,8 @@ df = pd.read_csv("data/loan.csv")
 # (1) The Occupation Field is not needed for this (lots of Different occupations).
 df.drop(['occupation'], axis=1, inplace=True)
 
-# (2) The Categorized Strings should be converted to integer Vales for the analysis.
-df['gender'] = df['gender'].map({'Male': 0, 'Female': 1})
+# (2) The Categorized Strings should be converted to integer values for the analysis.
+df['gender'] = df['gender'].map({'Female': 0, 'Male': 1})
 
 for i, j in enumerate(df['education_level']):
     if j == 'High School':
@@ -23,14 +23,16 @@ for i, j in enumerate(df['education_level']):
     else:
         df.loc[i:i, 'education_level'] = 2
 
-df['marital_status'] = df['marital_status'].map({'Married': 0, 'Single': 1})
-df['loan_status'] = df['loan_status'].map({'Approved': 0, 'Denied': 1})
+df['marital_status'] = df['marital_status'].map({'Single': 0, 'Married': 1})
+df['loan_status'] = df['loan_status'].map({'Denied': 0, 'Approved': 1})
 
-# # (3)[a] Create a Heatmap for the given DataFrame.
-# plt.figure(figsize=(10, 8))
-# sb.heatmap(df.corr(), annot=True)
-# plt.show()
-#
+print(df.head(20).to_string())
+
+# (3)[a] Create a Heatmap for the given DataFrame.
+plt.figure(figsize=(18,12))
+sb.heatmap(df.corr(), annot=True)
+plt.show()
+
 # # # (3)[b] Create Histograms that compare:
 # loan_approved = df['loan_status'] == 0
 # loan_denied = df['loan_status'] == 1
@@ -75,7 +77,7 @@ Y = df['loan_status'].astype('float32')
 X = df.drop("loan_status", axis=1).astype('float32')
 
 model = keras.Sequential()
-model.add(layers.Dense(7, activation="relu"))  # input layer
+model.add(layers.Dense(6, activation="relu"))  # input layer
 # model.add(layers.Dense(5, activation="relu"))  # input layer
 model.add(layers.Dense(3, activation="relu"))  # input layer
 model.add(layers.Dense(1, activation="sigmoid"))  # hidden layer 1
@@ -84,12 +86,29 @@ model.add(layers.Dense(1, activation="sigmoid"))  # hidden layer 1
 
 model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['accuracy'])
 
-results = model.fit(X, Y, validation_split=0.21, batch_size=100, epochs=200)
+results = model.fit(X, Y, validation_split=0.21, batch_size=1024, epochs=210, verbose=1)
 
 acc_chart(results)
 loss_chart(results)
 
-model.save("models/loan.keras")
+test_loan_preds = [
+    np.array([50,1,2,2,140000,700]),    # Single Older People Who Make a Lot of Money but Have Bad Credit
+    np.array([18,1,0,1,72000,400]),     # Young Married Professionals with Moderate Income and Good Credit
+    np.array([33,0,0,0,12000,255]),     # Single Young Adults with Low Income and Average Credit
+
+]
+
+
+for applicant in test_loan_preds:
+    # print(applicant)
+    predictions = model.predict(np.array([applicant]))
+    prediction = (predictions > 0.5).astype(int)
+
+    print(prediction[0])
+
+
+
+# model.save("models/loan.keras")
 
 
 
