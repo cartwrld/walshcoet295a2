@@ -14,9 +14,10 @@ crops_arr = np.unique(df['Crop'])
 # create dict for the map to convert all vals to int at once
 crop_dict = {crop: i for i, crop in enumerate(crops_arr)}
 
-print(crop_dict)
 
+print(df.head(200).to_string())
 df['Crop'] = df['Crop'].map(crop_dict)
+print(df.head(200).to_string())
 
 plt.figure(figsize=(20, 12))
 sb.heatmap(df.corr(), annot=True)
@@ -33,9 +34,6 @@ def compile_model(optimizer, loss, title):
         layers.Dropout(0.6),
         layers.Dense(256, activation="leaky_relu"),
         layers.Dropout(0.2),
-
-
-
         layers.Dense(len(crops_arr), activation="softmax"),
 
     ])
@@ -71,9 +69,6 @@ def get_top_crops(preds, crop_dict):
 
         for key, value in crop_dict.items():
             if value == first_index:
-                # print(f"first_index: {first_index}")
-                # print(f"first_highest: {first_highest}")
-                # print(f"kv: {key}:{value}")
                 return [first_index, first_highest, key]
 
         return None
@@ -82,7 +77,7 @@ def get_top_crops(preds, crop_dict):
 
     first_crop = details[2]
     # print(first_crop)
-    print("=============================================================")
+    print("=============================================")
     print(f"1st Place Crop: {first_crop}, Probability: {details[1]:.4f}")
 
     preds[details[0]] = -1
