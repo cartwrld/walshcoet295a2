@@ -25,7 +25,6 @@ df['Crop'] = df['Crop'].map(crop_dict)
 
 
 def compile_model(optimizer, loss, title, vs):
-
     X = df.drop("Crop", axis=1).astype('float32')
     Y = df['Crop'].astype('float32')
 
@@ -43,16 +42,15 @@ def compile_model(optimizer, loss, title, vs):
     loss_chart(results, title)
 
     test_predictions = [
-        np.array([108,22,46,26.3745356,86.3745356,6.357345,53.45757]),   # watermelon
-        np.array([70,68,45,33.745754365,92.34576436,6.4574587,203.345753754]),   # papaya
-        np.array([35, 142, 203, 21.345756345, 90.3456347, 5.456356, 123.34563575])   # apple
-
+        np.array([108, 22, 46, 26.3745356, 86.3745356, 6.357345, 53.45757]),          # watermelon
+        np.array([70, 68, 45, 33.745754365, 92.34576436, 6.4574587, 203.345753754]),  # papaya
+        np.array([35, 142, 203, 21.345756345, 90.3456347, 5.456356, 123.34563575])    # apple
     ]
 
     for test_pred in test_predictions:
-        test_pred = test_pred.reshape(1, -1)  # Reshape to (1, input_size)
+        test_pred = test_pred.reshape(1, -1)
         test_model_preds = model.predict(test_pred).astype("float32")
-        get_top_crops(test_model_preds[0], crop_dict)  # Pass the first element
+        get_top_crops(test_model_preds[0], crop_dict)
 
 
 def get_top_crops(preds, crops):
