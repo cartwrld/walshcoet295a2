@@ -7,6 +7,15 @@ import matplotlib.pyplot as plt
 
 from charts import acc_chart, loss_chart
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                   #
+#   Name:            Carter Walsh (walsh0715)       #
+#   Class:           COET295 - Assignment 2         #
+#   Instructor:      Bryce Barrie & Wade Lahoda     #
+#   Date:            Monday, May 27th, 2024         #
+#                                                   #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 df = pd.read_csv("data/loan.csv")
 
 # (1) The Occupation Field is not needed for this (lots of Different occupations).
@@ -31,12 +40,13 @@ print(df.head(20).to_string())
 # (3)[a] Create a Heatmap for the given DataFrame.
 plt.figure(figsize=(18, 12))
 sb.heatmap(df.corr(), annot=True)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
 plt.show()
 
 # # (3)[b] Create Histograms that compare:
 loan_approved = df['loan_status'] == 0
 loan_denied = df['loan_status'] == 1
-
 
 
 # (3)[b]{i} Age against Approved/Denied
@@ -48,13 +58,13 @@ plt.xlabel("Applicant Age")
 plt.title("Loan Status -vs- Age")
 plt.show()
 
+
 # (3)[b]{ii} Education against Approved/Denied
 bins = np.arange(0, 4) - 0.5
 plt.hist(df[loan_approved]['education_level'], color='b', alpha=0.5, bins=bins, label="Approved", edgecolor='black')
 plt.hist(df[loan_denied]['education_level'], color='r', alpha=0.5, bins=bins, label="Denied", edgecolor='black')
 plt.legend()
 plt.xticks(range(0, 3))
-# plt.yticks(np.arange(0, 30))
 plt.ylabel("Number of Applicants")
 plt.xlabel("Education Level")
 plt.title("Loan Status -vs- Education Level")
@@ -72,6 +82,7 @@ plt.title("Loan Status -vs- Marital Status")
 plt.xticks(range(0, 2))
 plt.show()
 
+
 #  (4) Create an appropriate mode given the Modified DataFrame you have prepared.
 Y = df['loan_status'].astype('float32')
 X = df.drop("loan_status", axis=1).astype('float32')
@@ -80,7 +91,6 @@ model = keras.Sequential()
 model.add(layers.Dense(6, activation="leaky_relu"))  # input layer
 model.add(layers.Dense(3, activation="leaky_relu"))  # input layer
 model.add(layers.Dense(1, activation="sigmoid"))  # hidden layer 1
-
 
 model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['accuracy'])
 
@@ -96,7 +106,6 @@ test_loan_preds = [
     np.array([18, 1, 0, 1, 72000, 400]),  # should be approved
     # adult female / single / highschool / low income / poor credit
     np.array([33, 0, 0, 0, 12000, 255]),  # should be denied
-
 ]
 
 for applicant in test_loan_preds:
